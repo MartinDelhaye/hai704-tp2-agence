@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by XML-WS Runtime (https://github.com/eclipse-ee4j/metro-jax-ws). Runtime's version is XML-WS Runtime 4.0.5 git-revision#c828e2e. -->
+<xs:schema xmlns:tns="http://hai704i.hotel.fr/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0"
+           targetNamespace="http://hai704i.hotel.fr/">
+
+    <xs:element name="AgenceInconnueException" nillable="true" type="tns:faultInfo"/>
+
+    <xs:element name="chercherOffres" type="tns:chercherOffres"/>
+
+    <xs:element name="chercherOffresResponse" type="tns:chercherOffresResponse"/>
+
+    <xs:complexType name="chercherOffres">
+        <xs:sequence>
+            <xs:element name="demande" type="tns:demandeRecherche" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="demandeRecherche">
+        <xs:sequence>
+            <xs:element name="agence" type="xs:string" minOccurs="0"/>
+            <xs:element name="arrivee" type="xs:date" minOccurs="0"/>
+            <xs:element name="depart" type="xs:date" minOccurs="0"/>
+            <xs:element name="etoilesMin" type="xs:int"/>
+            <xs:element name="personnes" type="xs:int"/>
+            <xs:element name="prixMax" type="xs:decimal" minOccurs="0"/>
+            <xs:element name="ville" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="chercherOffresResponse">
+        <xs:sequence>
+            <xs:element name="offre" type="tns:offre" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="offre">
+        <xs:sequence>
+            <xs:element name="arrivee" type="xs:date" minOccurs="0"/>
+            <xs:element name="capacite" type="xs:int"/>
+            <xs:element name="chambre" type="xs:string" minOccurs="0"/>
+            <xs:element name="depart" type="xs:date" minOccurs="0"/>
+            <xs:element name="etoiles" type="xs:int"/>
+            <xs:element name="hotel" type="xs:string" minOccurs="0"/>
+            <xs:element name="id" type="xs:string" minOccurs="0"/>
+            <xs:element name="prixTotal" type="xs:decimal" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="faultInfo">
+        <xs:sequence>
+            <xs:element name="message" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
