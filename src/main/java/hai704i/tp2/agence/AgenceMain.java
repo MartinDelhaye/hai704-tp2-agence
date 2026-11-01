@@ -10,45 +10,58 @@ import java.util.List;
 import java.util.UUID;
 
 public class AgenceMain {
-    public static void main(String[] args) throws Exception {
-        String adresse = args.length > 0 ? args[0] : "http://localhost:8081/hotel";
-        String agence = args.length > 1 ? args[1] : "AG-01";
-        String secret = args.length > 2 ? args[2] : "";
+    private static final int DELAI_CONNEXION_MS = 2_000;
+    private static final int DELAI_REPONSE_MS = 5_000;
 
-        HotelPort port = new HotelService().getHotelSoapPort();
-        ((BindingProvider) port).getRequestContext()
-                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, adresse);
+    public static void main(String[] args)
+            throws Exception {
+        String agence = args.length > 0 ? args[0] : "AG-01";
+        String secret = args.length > 1 ? args[1] : "";
+        List<String> adresses = args.length > 2
+                ? List.of(args).subList(2, args.length)
+                : List.of("http://localhost:8081/hotel", "http://localhost:8082/hotel");
 
-        try {
-            List<Offre> offres = port.chercherOffres(demandeRecherche(agence));
-            if (offres.isEmpty()) {
-                System.out.println("Aucune offre.");
-                return;
-            }
-            Offre choisie = offres.get(0);
-            System.out.println("Offre choisie : " + choisie.getId() + " / " + choisie.getChambre()
-                    + " / " + choisie.getPrixTotal() + " EUR (prix annoncé)");
+        List<HotelClient> hotels = adresses.stream()
+                .map(a -> new HotelClient(a, DELAI_CONNEXION_MS, DELAI_REPONSE_MS))
+                .toList();
+        AgenceService agenceService = new AgenceService(hotels);
 
-            String idDemande = UUID.randomUUID().toString();
-            reserver(port, idDemande, agence, secret, choisie, "1. réservation");
-            reserver(port, idDemande, agence, secret, choisie, "2. rejeu (même idDemande)");
-            reserver(port, UUID.randomUUID().toString(), agence, secret, choisie,
-                    "3. nouvelle demande sur la même offre");
-        } catch (AgenceInconnueFaultException e) {
-            System.out.println("Refus de l'hôtel (agence) : " + e.getMessage());
-        } catch (DemandeInvalideFaultException e) {
-            System.out.println("Refus de l'hôtel (demande invalide) : " + e.getMessage());
-        } catch (WebServiceException e) {
-            System.out.println("Panne technique : l'hôtel est injoignable ou ne répond pas ("
-                    + e.getClass().getSimpleName() + ")");
+        long debut = System.nanoTime();
+        AgenceService.Resultat resultat = agenceService.rechercher(demandeRecherche(agence));
+        long dureeMs = (System.nanoTime() - debut) / 1_000_000;
+        System.out.println("(recherche terminée en " + dureeMs + " ms)");
+        resultat.incidents().forEach(i -> System.out.println("/!\\ " + i));
+        if (resultat.offres().isEmpty()) {
+            System.out.println("Aucune offre.");
+            return;
         }
+        System.out.println(resultat.offres().size() + " offre(s), de la moins chère à la plus chère :");
+        for (AgenceService.OffreHotel o : resultat.offres()) {
+            Offre f = o.offre();
+            System.out.printf("  %s | %s | %d* | %s EUR | %s%n",
+                    f.getHotel(), f.getChambre(), f.getEtoiles(), f.getPrixTotal(), f.getId());
+        }
+        if (Boolean.getBoolean("rechercheSeule")) return;
+
+        AgenceService.OffreHotel choisie = resultat.offres().get(0);
+        String idDemande = UUID.randomUUID().toString();
+        reserver(choisie.hotel(), idDemande, agence, secret, choisie.offre(), "1. réservation");
+        reserver(choisie.hotel(), idDemande, agence, secret, choisie.offre(), "2. rejeu (même idDemande)");
+        reserver(choisie.hotel(), UUID.randomUUID().toString(), agence, secret, choisie.offre(),
+                "3. nouvelle demande sur la même offre");
     }
 
-    private static void reserver(HotelPort port, String idDemande, String agence, String secret,
-                                 Offre offre, String etape) {
+    private static void reserver(
+            HotelClient hotel,
+            String idDemande,
+            String agence,
+            String secret,
+            Offre offre,
+            String etape
+    ) {
         System.out.println("--- " + etape);
         try {
-            Confirmation c = port.reserver(demandeReservation(idDemande, agence, secret, offre.getId()));
+            Confirmation c = hotel.reserver(demandeReservation(idDemande, agence, secret, offre.getId()));
             boolean memePrix = c.getPrixTotal().compareTo(offre.getPrixTotal()) == 0;
             System.out.println("Réservation " + c.getReferenceReservation() + " : " + c.getPrixTotal()
                     + " EUR" + (c.isRejeu() ? " (rejeu : déjà enregistrée)" : "")
@@ -61,10 +74,13 @@ public class AgenceMain {
             System.out.println("Refus de l'hôtel (offre) : " + e.getMessage());
         } catch (DemandeInvalideFaultException e) {
             System.out.println("Refus de l'hôtel (demande invalide) : " + e.getMessage());
+        } catch (WebServiceException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    private static DemandeRecherche demandeRecherche(String agence) throws Exception {
+    private static DemandeRecherche demandeRecherche(String agence)
+            throws Exception {
         DatatypeFactory f = DatatypeFactory.newInstance();
         DemandeRecherche d = new DemandeRecherche();
         d.setAgence(agence);
@@ -77,8 +93,12 @@ public class AgenceMain {
         return d;
     }
 
-    private static DemandeReservation demandeReservation(String idDemande, String agence,
-                                                         String secret, String idOffre) {
+    private static DemandeReservation demandeReservation(
+            String idDemande,
+            String agence,
+            String secret,
+            String idOffre
+    ) {
         IdentificationAgence id = new IdentificationAgence();
         id.setIdAgence(agence);
         id.setSecret(secret);
