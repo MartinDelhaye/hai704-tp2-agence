@@ -10,6 +10,24 @@
             <xsd:import namespace="http://hai704i.hotel.fr/" schemaLocation="hotel.xsd"/>
         </xsd:schema>
     </types>
+    <message name="reserver">
+        <part name="parameters" element="tns:reserver"/>
+    </message>
+    <message name="reserverResponse">
+        <part name="parameters" element="tns:reserverResponse"/>
+    </message>
+    <message name="AgenceNonAuthentifieeFaultException">
+        <part name="fault" element="tns:AgenceNonAuthentifieeException"/>
+    </message>
+    <message name="DemandeInvalideFaultException">
+        <part name="fault" element="tns:DemandeInvalideException"/>
+    </message>
+    <message name="PaiementRefuseFaultException">
+        <part name="fault" element="tns:PaiementRefuseException"/>
+    </message>
+    <message name="OffreIndisponibleFaultException">
+        <part name="fault" element="tns:OffreIndisponibleException"/>
+    </message>
     <message name="chercherOffres">
         <part name="parameters" element="tns:chercherOffres"/>
     </message>
@@ -20,16 +38,51 @@
         <part name="fault" element="tns:AgenceInconnueException"/>
     </message>
     <portType name="HotelPort">
+        <operation name="reserver">
+            <input wsam:Action="http://hai704i.hotel.fr/HotelPort/reserverRequest" message="tns:reserver"/>
+            <output wsam:Action="http://hai704i.hotel.fr/HotelPort/reserverResponse" message="tns:reserverResponse"/>
+            <fault message="tns:AgenceNonAuthentifieeFaultException" name="AgenceNonAuthentifieeFaultException"
+                   wsam:Action="http://hai704i.hotel.fr/HotelPort/reserver/Fault/AgenceNonAuthentifieeFaultException"/>
+            <fault message="tns:DemandeInvalideFaultException" name="DemandeInvalideFaultException"
+                   wsam:Action="http://hai704i.hotel.fr/HotelPort/reserver/Fault/DemandeInvalideFaultException"/>
+            <fault message="tns:PaiementRefuseFaultException" name="PaiementRefuseFaultException"
+                   wsam:Action="http://hai704i.hotel.fr/HotelPort/reserver/Fault/PaiementRefuseFaultException"/>
+            <fault message="tns:OffreIndisponibleFaultException" name="OffreIndisponibleFaultException"
+                   wsam:Action="http://hai704i.hotel.fr/HotelPort/reserver/Fault/OffreIndisponibleFaultException"/>
+        </operation>
         <operation name="chercherOffres">
             <input wsam:Action="http://hai704i.hotel.fr/HotelPort/chercherOffresRequest" message="tns:chercherOffres"/>
             <output wsam:Action="http://hai704i.hotel.fr/HotelPort/chercherOffresResponse"
                     message="tns:chercherOffresResponse"/>
             <fault message="tns:AgenceInconnueFaultException" name="AgenceInconnueFaultException"
                    wsam:Action="http://hai704i.hotel.fr/HotelPort/chercherOffres/Fault/AgenceInconnueFaultException"/>
+            <fault message="tns:DemandeInvalideFaultException" name="DemandeInvalideFaultException"
+                   wsam:Action="http://hai704i.hotel.fr/HotelPort/chercherOffres/Fault/DemandeInvalideFaultException"/>
         </operation>
     </portType>
     <binding name="HotelSoapPortBinding" type="tns:HotelPort">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="reserver">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+            <fault name="AgenceNonAuthentifieeFaultException">
+                <soap:fault name="AgenceNonAuthentifieeFaultException" use="literal"/>
+            </fault>
+            <fault name="DemandeInvalideFaultException">
+                <soap:fault name="DemandeInvalideFaultException" use="literal"/>
+            </fault>
+            <fault name="PaiementRefuseFaultException">
+                <soap:fault name="PaiementRefuseFaultException" use="literal"/>
+            </fault>
+            <fault name="OffreIndisponibleFaultException">
+                <soap:fault name="OffreIndisponibleFaultException" use="literal"/>
+            </fault>
+        </operation>
         <operation name="chercherOffres">
             <soap:operation soapAction=""/>
             <input>
@@ -40,6 +93,9 @@
             </output>
             <fault name="AgenceInconnueFaultException">
                 <soap:fault name="AgenceInconnueFaultException" use="literal"/>
+            </fault>
+            <fault name="DemandeInvalideFaultException">
+                <soap:fault name="DemandeInvalideFaultException" use="literal"/>
             </fault>
         </operation>
     </binding>

@@ -4,9 +4,21 @@
 
     <xs:element name="AgenceInconnueException" nillable="true" type="tns:faultInfo"/>
 
+    <xs:element name="AgenceNonAuthentifieeException" nillable="true" type="tns:faultInfo"/>
+
+    <xs:element name="DemandeInvalideException" nillable="true" type="tns:faultInfo"/>
+
+    <xs:element name="OffreIndisponibleException" nillable="true" type="tns:faultInfo"/>
+
+    <xs:element name="PaiementRefuseException" nillable="true" type="tns:faultInfo"/>
+
     <xs:element name="chercherOffres" type="tns:chercherOffres"/>
 
     <xs:element name="chercherOffresResponse" type="tns:chercherOffresResponse"/>
+
+    <xs:element name="reserver" type="tns:reserver"/>
+
+    <xs:element name="reserverResponse" type="tns:reserverResponse"/>
 
     <xs:complexType name="chercherOffres">
         <xs:sequence>
@@ -39,6 +51,7 @@
             <xs:element name="chambre" type="xs:string" minOccurs="0"/>
             <xs:element name="depart" type="xs:date" minOccurs="0"/>
             <xs:element name="etoiles" type="xs:int"/>
+            <xs:element name="expireLe" type="xs:dateTime" minOccurs="0"/>
             <xs:element name="hotel" type="xs:string" minOccurs="0"/>
             <xs:element name="id" type="xs:string" minOccurs="0"/>
             <xs:element name="prixTotal" type="xs:decimal" minOccurs="0"/>
@@ -48,6 +61,64 @@
     <xs:complexType name="faultInfo">
         <xs:sequence>
             <xs:element name="message" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="reserver">
+        <xs:sequence>
+            <xs:element name="demande" type="tns:demandeReservation" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="demandeReservation">
+        <xs:sequence>
+            <xs:element name="idDemande" type="xs:string" minOccurs="0"/>
+            <xs:element name="identification" type="tns:identificationAgence" minOccurs="0"/>
+            <xs:element name="idOffre" type="xs:string" minOccurs="0"/>
+            <xs:element name="voyageur" type="tns:voyageur" minOccurs="0"/>
+            <xs:element name="paiement" type="tns:paiement" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="identificationAgence">
+        <xs:sequence>
+            <xs:element name="idAgence" type="xs:string" minOccurs="0"/>
+            <xs:element name="secret" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="voyageur">
+        <xs:sequence>
+            <xs:element name="nom" type="xs:string" minOccurs="0"/>
+            <xs:element name="prenom" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="paiement">
+        <xs:sequence>
+            <xs:element name="anneeExpiration" type="xs:int"/>
+            <xs:element name="cvc" type="xs:string" minOccurs="0"/>
+            <xs:element name="moisExpiration" type="xs:int"/>
+            <xs:element name="numeroCarte" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="reserverResponse">
+        <xs:sequence>
+            <xs:element name="confirmation" type="tns:confirmation" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="confirmation">
+        <xs:sequence>
+            <xs:element name="arrivee" type="xs:date" minOccurs="0"/>
+            <xs:element name="chambre" type="xs:string" minOccurs="0"/>
+            <xs:element name="depart" type="xs:date" minOccurs="0"/>
+            <xs:element name="hotel" type="xs:string" minOccurs="0"/>
+            <xs:element name="idOffre" type="xs:string" minOccurs="0"/>
+            <xs:element name="prixTotal" type="xs:decimal" minOccurs="0"/>
+            <xs:element name="referenceReservation" type="xs:string" minOccurs="0"/>
+            <xs:element name="rejeu" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>
