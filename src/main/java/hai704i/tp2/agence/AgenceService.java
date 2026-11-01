@@ -5,20 +5,16 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.*;
 
-/** Logique de l'agence. Aucune classe engendrée ici : la console ne manipule que les types ci-dessous. */
 public class AgenceService {
 
-    // ---------- types propres à l'agence ----------
     public record Critere(String ville, LocalDate arrivee, LocalDate depart,
                           int personnes, int etoilesMin, BigDecimal prixMax) {}
 
-    /** source = adresse de l'hôtel d'origine (référence opaque, sert à réserver au bon endroit). */
     public record OffreAgence(String id, String hotel, String chambre, int etoiles, int capacite,
                               LocalDate arrivee, LocalDate depart, BigDecimal prixTotal, String source) {}
 
     public record Voyageur(String nom, String prenom) {}
 
-    /** Le numéro et le CVC ne sont jamais affichés : toString ne montre que les 4 derniers chiffres. */
     public record Carte(String numero, int mois, int annee, String cvc) {
         public String numeroMasque() { return "**** " + numero.substring(numero.length() - 4); }
         @Override public String toString() { return "Carte[" + numeroMasque() + "]"; }
@@ -29,7 +25,6 @@ public class AgenceService {
 
     public record Resultat(List<OffreAgence> offres, List<String> incidents) {}
 
-    /** L'hôtel a répondu et refusé : réessayer à l'identique ne changera rien. */
     public static class RefusException extends Exception {
         public enum Motif { AGENCE_INCONNUE, AUTHENTIFICATION, PAIEMENT, OFFRE_INDISPONIBLE, DEMANDE_INVALIDE }
         private final Motif motif;
@@ -38,7 +33,6 @@ public class AgenceService {
             this.motif = motif;
         }
         public Motif motif() { return motif; }
-        /** Phrase lisible : ce que l'hôtel a refusé et quoi faire ensuite. */
         public String explication() {
             String d = getMessage().isBlank() ? "" : " (" + getMessage() + ")";
             return switch (motif) {
@@ -53,12 +47,10 @@ public class AgenceService {
         }
     }
 
-    /** Panne technique : hôtel éteint, adresse erronée, réseau coupé ou réponse trop lente. */
     public static class PanneException extends Exception {
         public PanneException(String message, Throwable cause) { super(message, cause); }
     }
 
-    // ---------- service ----------
     private final String agence;
     private final String secret;
     private final List<HotelClient> hotels;
@@ -103,7 +95,6 @@ public class AgenceService {
         return new Resultat(List.copyOf(offres), List.copyOf(incidents));
     }
 
-    /** idDemande fourni par l'appelant : réessayer après une panne réutilise le même, donc jamais deux réservations. */
     public Reservation reserver(String idDemande, OffreAgence offre, Voyageur voyageur, Carte carte)
             throws RefusException, PanneException {
         HotelClient hotel = parAdresse.get(offre.source());

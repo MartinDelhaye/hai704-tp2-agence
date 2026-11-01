@@ -19,10 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Accès SOAP : seule classe (avec les classes engendrées) à connaître le proxy, l'adresse et les délais.
- * Elle traduit les classes engendrées vers les types de AgenceService, et les fautes vers RefusException.
- */
 public class HotelClient {
     private final String adresse;
     private final HotelPort port;
