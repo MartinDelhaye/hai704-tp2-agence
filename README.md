@@ -7,7 +7,7 @@
 Ce projet est le **consommateur** : il appelle le service web des hôtels.
 Il **ne dépend d'aucune classe du projet `hotel`** : tout ce qu'il connaît vient du contrat (WSDL + XSD).
 
-> État : A4
+> État : A5
 
 ## 1. Rôle et relations
 
@@ -62,7 +62,7 @@ Démarrer d'abord au moins un hôtel (voir le README de `hotel`), puis depuis la
 
 ```
 mvn -q clean compile
-mvn -q exec:java "-Dexec.args=http://localhost:8081/hotel AG-01"
+mvn -q exec:java "-Dexec.args=http://localhost:8081/hotel AG-01 secret-ag-01"
 ```
 
 Arguments de `AgenceMain` :
@@ -71,6 +71,11 @@ Arguments de `AgenceMain` :
 |---|---|---|
 | 1 | adresse du point d'accès de l'hôtel | `http://localhost:8081/hotel` |
 | 2 | identifiant de l'agence | `AG-01` |
+| 3 | secret de l'agence (voir le README de `hotel`, section « Secrets des agences ») | vide |
+
+Le secret est lu dans les arguments de lancement : il n'est pas écrit dans le code.
+`AgenceMain` déroule un scénario : recherche, choix de la première offre, réservation, rejeu de la même demande, puis nouvelle demande sur la même offre (refusée).
 
 L'adresse n'est pas figée dans le code : la changer ne demande aucune recompilation.
-Dans IntelliJ : *Run > Edit Configurations*, champ **Program arguments** (trois configurations sont utilisées : « Agence OK », « Agence port erroné », « Agence inconnue »).
+
+Dans IntelliJ : *Run > Edit Configurations*, champ **Program arguments** (configurations utilisées : « Agence OK », « Agence mauvais secret », « Agence port erroné », « Agence inconnue »).
