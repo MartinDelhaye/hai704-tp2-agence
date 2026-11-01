@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Agence réserve" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="hai704i.tp2.agence.AgenceMain" />
+    <module name="agence" />
+    <option name="PROGRAM_PARAMETERS" value="http://localhost:8081/hotel AG-01 secret-ag-01" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="hai704i.tp2.agence.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
