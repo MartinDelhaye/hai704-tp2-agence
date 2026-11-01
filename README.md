@@ -7,7 +7,7 @@
 Ce projet est le **consommateur** : il appelle le service web des hôtels.
 Il **ne dépend d'aucune classe du projet `hotel`** : tout ce qu'il connaît vient du contrat (WSDL + XSD).
 
-> État : A5
+> État : A8
 
 ## 1. Rôle et relations
 
